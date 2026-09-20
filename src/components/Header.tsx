@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
+import logoUrl from '../assets/logo.svg?url'
 import { useCart } from '../context/CartContext'
 import { navItems, site } from '../data/site'
 import { useCategories } from '../lib/categories'
@@ -56,7 +57,7 @@ export function Header() {
         </button>
 
         <Link className="brand" to="/" onClick={closeMenu}>
-          <img className="brand-mark" src="/logo.svg" alt="tescgsm" width={36} height={36} />
+          <img className="brand-mark" src={logoUrl} alt="tescgsm" width={36} height={36} />
           <span className="wordmark">{site.name}</span>
         </Link>
 
