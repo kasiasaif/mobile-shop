@@ -25,7 +25,7 @@ function loadEnvFile() {
 loadEnvFile()
 
 const adminUser = process.env.ADMIN_USER ?? 'admin'
-const adminPassword = process.env.ADMIN_PASSWORD ?? 'tescgsm'
+const adminPassword = process.env.ADMIN_PASSWORD ?? ''
 const sessions = new Map<string, number>()
 const sessionMs = 1000 * 60 * 60 * 8
 
