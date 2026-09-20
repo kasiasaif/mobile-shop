@@ -2,7 +2,7 @@
 
 Workshop for phone-repair parts — batteries and LCD screens. Example of a website and admin dashboard.
 
-**Shop:** [tescgsm.es](https://tescgsm.es)  
+**Shop:** [tescgsm.es](https://tescgsm.es) · [source](https://github.com/kasiasaif/mobile-shop)  
 **Admin CRM:** [tescgsm-admin.onrender.com](https://tescgsm-admin.onrender.com) · [source](https://github.com/kasiasaif/tescgsm-admin)
 
 This pair of projects is an example of how a website can be managed from a separate admin: catalog, prices, and **custom homepage banners**.
