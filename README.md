@@ -27,19 +27,4 @@ You can explore the CRM without changing live data.
    - **Username:** `visitor`
    - **Password:** `welcome`
 
-A visitor can look around. Saving products, banners, or account details is blocked.
 
-Staff logins stay in a local `.env` file and in the host’s dashboard. They are not in this repository.
-
-## Secrets
-
-Do not commit passwords, database URLs, API keys, or `.env` files. `.gitignore` keeps those off GitHub. Copy `.env.example` for local setup and leave the values empty in git.
-
-## Local shop
-
-```bash
-npm install
-npm run dev
-```
-
-Open http://localhost:5173. Deploy happens from the `production` branch.
