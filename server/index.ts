@@ -140,5 +140,4 @@ async function handle(request: IncomingMessage, response: ServerResponse) {
 
 server.listen(port, '127.0.0.1', () => {
   console.log(`tescgsm API on http://127.0.0.1:${port}`)
-  console.log('MySQL Workbench: 127.0.0.1:3306  user tescgsm  password tescgsm  schema tescgsm')
 })
