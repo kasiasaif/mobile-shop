@@ -123,7 +123,7 @@ code {
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 1rem;
-  min-height: 5.25rem;
+  min-height: 4.25rem;
   position: relative;
   z-index: 12;
 }
@@ -138,12 +138,11 @@ code {
 }
 
 .brand-mark {
-  width: 4rem;
-  height: 4rem;
+  width: 2.15rem;
+  height: 2.15rem;
   flex-shrink: 0;
   display: block;
   border-radius: 50%;
-  object-fit: cover;
 }
 
 .wordmark {
@@ -927,11 +926,15 @@ code {
   display: grid;
   grid-template-columns: 1.4fr 1fr 1.2fr;
   gap: 1.5rem;
+  align-items: end;
 }
 
 .footer-grid nav {
-  display: grid;
-  gap: 0.35rem;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 1.25rem;
+  white-space: nowrap;
 }
 
 .footer-grid a {

@@ -45,7 +45,7 @@ export const faqs = [
   {
     question: 'Are these original parts?',
     answer:
-      'These listings come from MySQL. Change parts in the admin site or in MySQL Workbench.',
+      'Yes. These are original parts for professional repair work, and they come with a quality guarantee. If a part is faulty, contact us and we will replace it.',
   },
   {
     question: 'Can I get a quote for a model that is not listed yet?',

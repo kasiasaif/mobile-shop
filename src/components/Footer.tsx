@@ -7,11 +7,10 @@ export function Footer() {
       <div className="shell footer-grid">
         <div>
           <p className="brand">
-            <img className="brand-mark" src="/logo.png" alt="tescgsm" width={64} height={64} />
+            <img className="brand-mark" src="/logo.svg" alt="tescgsm" width={36} height={36} />
             <span className="wordmark">{site.name}</span>
           </p>
           <p className="muted">{site.tagline} · {site.location}</p>
-          <p className="muted">{site.url.replace('https://', '')}</p>
         </div>
 
         <nav aria-label="Footer">
