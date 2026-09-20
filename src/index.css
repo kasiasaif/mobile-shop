@@ -138,12 +138,11 @@ code {
 }
 
 .brand-mark {
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 2.15rem;
+  height: 2.15rem;
   flex-shrink: 0;
   display: block;
   border-radius: 50%;
-  object-fit: cover;
 }
 
 .wordmark {
