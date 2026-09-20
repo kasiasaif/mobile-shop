@@ -56,7 +56,7 @@ export function Header() {
         </button>
 
         <Link className="brand" to="/" onClick={closeMenu}>
-          <img className="brand-mark" src="/logo.svg" alt="tescgsm" width={36} height={36} />
+          <img className="brand-mark" src="/logo.png" alt="tescgsm" width={44} height={44} />
           <span className="wordmark">{site.name}</span>
         </Link>
 

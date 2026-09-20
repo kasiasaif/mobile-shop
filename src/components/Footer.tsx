@@ -7,7 +7,7 @@ export function Footer() {
       <div className="shell footer-grid">
         <div>
           <p className="brand">
-            <img className="brand-mark" src="/logo.svg" alt="tescgsm" width={36} height={36} />
+            <img className="brand-mark" src="/logo.png" alt="tescgsm" width={44} height={44} />
             <span className="wordmark">{site.name}</span>
           </p>
           <p className="muted">{site.tagline} · {site.location}</p>
