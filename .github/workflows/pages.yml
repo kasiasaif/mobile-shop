@@ -26,11 +26,11 @@ jobs:
       - run: npm ci
         env:
           VITE_SHOP_URL: https://tescgsm.es
-          VITE_ADMIN_URL: https://tescgsm-admin.es
+          VITE_ADMIN_URL: https://tescgsm-admin.onrender.com
       - run: npm run build
         env:
           VITE_SHOP_URL: https://tescgsm.es
-          VITE_ADMIN_URL: https://tescgsm-admin.es
+          VITE_ADMIN_URL: https://tescgsm-admin.onrender.com
       - run: cp dist/index.html dist/404.html
       - uses: actions/upload-pages-artifact@v4
         with:

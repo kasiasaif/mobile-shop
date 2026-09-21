@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import { type Product } from '../data/site'
 import { isActive } from './active'
+import { readCatalogJson, useCatalogLive } from './catalogApi'
 import { loadCategories } from './categories'
 
 function isNumericId(value: unknown): boolean {
@@ -19,24 +20,9 @@ function withImageUrl(product: Product): Product {
   }
 }
 
-async function readJson(url: string): Promise<Product[]> {
-  const response = await fetch(url)
-  if (!response.ok) {
-    throw new Error(`Could not load ${url}`)
-  }
-  return (await response.json()) as Product[]
-}
-
 export async function loadProducts(): Promise<Product[]> {
-  const fallback = `${import.meta.env.BASE_URL}products.json`
-  if (import.meta.env.DEV) {
-    try {
-      return (await readJson('/api/products')).map(withImageUrl).filter((item) => isNumericId(item.id) && isNumericId(item.category))
-    } catch {
-      return (await readJson(fallback)).map(withImageUrl).filter((item) => isNumericId(item.id) && isNumericId(item.category))
-    }
-  }
-  return (await readJson(fallback)).map(withImageUrl).filter((item) => isNumericId(item.id) && isNumericId(item.category))
+  const items = await readCatalogJson<Product[]>('/api/products', `${import.meta.env.BASE_URL}products.json`)
+  return items.map(withImageUrl).filter((item) => isNumericId(item.id) && isNumericId(item.category))
 }
 
 export async function loadLiveProducts(): Promise<Product[]> {
@@ -48,25 +34,7 @@ export async function loadLiveProducts(): Promise<Product[]> {
 }
 
 export function useProducts() {
-  const [products, setProducts] = useState<Product[]>([])
-  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
-
-  useEffect(() => {
-    let cancelled = false
-    loadLiveProducts()
-      .then((items) => {
-        if (cancelled) return
-        setProducts(items)
-        setStatus('ready')
-      })
-      .catch(() => {
-        if (cancelled) return
-        setStatus('error')
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  return { products, status }
+  const load = useCallback(() => loadLiveProducts(), [])
+  const { data, status } = useCatalogLive(load, [] as Product[])
+  return { products: data, status }
 }

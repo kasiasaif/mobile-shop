@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import { type Banner } from '../data/banner'
+import { readCatalogJson, useCatalogLive } from './catalogApi'
 
 function withImageUrl(banner: Banner): Banner | null {
   const id = Number(banner.id)
@@ -12,44 +13,16 @@ function withImageUrl(banner: Banner): Banner | null {
   }
 }
 
-async function readJson(url: string): Promise<Banner[]> {
-  const response = await fetch(url)
-  if (!response.ok) throw new Error(`Could not load ${url}`)
-  return (await response.json()) as Banner[]
-}
-
 export async function loadBanners(): Promise<Banner[]> {
-  const fallback = `${import.meta.env.BASE_URL}banners.json`
-  if (import.meta.env.DEV) {
-    try {
-      return (await readJson('/api/banners')).map(withImageUrl).filter((item): item is Banner => item !== null)
-    } catch {
-      return (await readJson(fallback)).map(withImageUrl).filter((item): item is Banner => item !== null)
-    }
-  }
-  return (await readJson(fallback)).map(withImageUrl).filter((item): item is Banner => item !== null)
+  const items = await readCatalogJson<Banner[]>('/api/banners', `${import.meta.env.BASE_URL}banners.json`)
+  return items.map(withImageUrl).filter((item): item is Banner => item !== null)
 }
 
 export function useBanners() {
-  const [banners, setBanners] = useState<Banner[]>([])
-  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
-
-  useEffect(() => {
-    let cancelled = false
-    loadBanners()
-      .then((items) => {
-        if (cancelled) return
-        setBanners(items.filter((item) => item.active === true).sort((a, b) => a.sortOrder - b.sortOrder))
-        setStatus('ready')
-      })
-      .catch(() => {
-        if (cancelled) return
-        setStatus('error')
-      })
-    return () => {
-      cancelled = true
-    }
+  const load = useCallback(async () => {
+    const items = await loadBanners()
+    return items.filter((item) => item.active === true).sort((a, b) => a.sortOrder - b.sortOrder)
   }, [])
-
-  return { banners, status }
+  const { data, status } = useCatalogLive(load, [] as Banner[])
+  return { banners: data, status }
 }
