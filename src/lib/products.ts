@@ -16,13 +16,14 @@ function asCount(value: unknown, fallback: number): number {
 
 function withImageUrl(product: Product): Product {
   const raw = product as Product & { out_of_stock?: unknown }
+  const hasStock = product.items != null || product.outOfStock != null || raw.out_of_stock != null
   const base = import.meta.env.BASE_URL
   return {
     ...product,
     id: Number(product.id),
     category: Number(product.category),
     image: `${base}${product.image.replace(/^\//, '')}`,
-    items: asCount(product.items, 0),
+    items: asCount(product.items, hasStock ? 0 : 1),
     outOfStock: asCount(product.outOfStock ?? raw.out_of_stock, 1),
     active: isActive(product.active),
   }
