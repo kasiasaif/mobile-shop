@@ -8,7 +8,7 @@
     "dev:api": "node --import tsx --watch server/index.ts",
     "dev:web": "vite",
     "db:export": "node --import tsx server/export-json.ts",
-    "build": "npm run db:export && tsc -b && vite build",
+    "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview"
   },
