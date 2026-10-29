@@ -9,13 +9,21 @@ function isNumericId(value: unknown): boolean {
   return Number.isInteger(id) && id > 0
 }
 
+function asCount(value: unknown, fallback: number): number {
+  const count = Number(value)
+  return Number.isInteger(count) ? count : fallback
+}
+
 function withImageUrl(product: Product): Product {
+  const raw = product as Product & { out_of_stock?: unknown }
   const base = import.meta.env.BASE_URL
   return {
     ...product,
     id: Number(product.id),
     category: Number(product.category),
     image: `${base}${product.image.replace(/^\//, '')}`,
+    items: asCount(product.items, 0),
+    outOfStock: asCount(product.outOfStock ?? raw.out_of_stock, 1),
     active: isActive(product.active),
   }
 }

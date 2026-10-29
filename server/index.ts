@@ -36,10 +36,14 @@ function asProduct(body: Record<string, unknown>): Product | null {
   const previous = body.previousPrice === '' || body.previousPrice == null
     ? undefined
     : Number(body.previousPrice)
+  const items = body.items == null || body.items === '' ? 0 : Number(body.items)
+  const outOfStock = body.outOfStock == null || body.outOfStock === '' ? 1 : Number(body.outOfStock)
   const active = body.active == null ? true : Boolean(body.active)
 
   if (!name || !Number.isInteger(category) || category < 1 || !brand || !model || !spec || !image || !Number.isFinite(price)) return null
   if (previous !== undefined && !Number.isFinite(previous)) return null
+  if (!Number.isInteger(items) || items < 0) return null
+  if (!Number.isInteger(outOfStock) || outOfStock < 0) return null
 
   return {
     id: Number.isInteger(id) && id > 0 ? id : 0,
@@ -51,6 +55,8 @@ function asProduct(body: Record<string, unknown>): Product | null {
     price,
     previousPrice: previous,
     image: image.replace(/^\//, ''),
+    items,
+    outOfStock,
     active,
   }
 }

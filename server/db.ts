@@ -2,7 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import mysql from 'mysql2/promise'
-import { seedCategories, seedProducts, type Product } from '../src/data/catalog.ts'
+import { seedCategories, type Product } from '../src/data/catalog.ts'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const jsonPath = join(root, 'public', 'products.json')
@@ -36,6 +36,8 @@ export type ProductRow = {
   price: number
   previous_price: number | null
   image: string
+  items: number
+  out_of_stock: number
   active: number
 }
 
@@ -117,7 +119,8 @@ async function init(): Promise<mysql.Pool> {
       id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
       active TINYINT(1) NOT NULL DEFAULT 1,
-      sort_order INT NOT NULL DEFAULT 0
+      sort_order INT NOT NULL DEFAULT 0,
+      min_items INT NOT NULL DEFAULT 0
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `)
   await created.query(`
@@ -132,6 +135,7 @@ async function init(): Promise<mysql.Pool> {
       previous_price INT NULL,
       image VARCHAR(255) NOT NULL,
       active TINYINT(1) NOT NULL DEFAULT 1
+      out_of_stock INT NOT NULL DEFAULT 1,
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `)
   pool = created
@@ -143,6 +147,9 @@ async function init(): Promise<mysql.Pool> {
   }
   await ensureColumn(created, 'products', 'active', 'TINYINT(1) NOT NULL DEFAULT 1')
   await migrateCatalogIds(created)
+  await ensureColumn(created, 'products', 'items', 'INT NOT NULL DEFAULT 0')
+  await ensureColumn(created, 'products', 'out_of_stock', 'INT NOT NULL DEFAULT 1')
+  await ensureColumn(created, 'categories', 'min_items', 'INT NOT NULL DEFAULT 0')
   await seedCategoriesIfEmpty()
   await linkProductsToCategories(created)
   await seedIfEmpty()
@@ -236,11 +243,12 @@ async function migrateCatalogIds(db: mysql.Pool) {
       name VARCHAR(255) NOT NULL,
       active TINYINT(1) NOT NULL DEFAULT 1,
       sort_order INT NOT NULL DEFAULT 0
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+      sort_order INT NOT NULL DEFAULT 0,
+      min_items INT NOT NULL DEFAULT 0
   `)
   const [categoryRows] = await db.query<mysql.RowDataPacket[]>(
     'SELECT id, name, active, sort_order FROM categories',
-  )
+    'SELECT id, name, active, sort_order, min_items FROM categories',
   const categoryMap = new Map<string, number>()
   const used = new Set<number>()
   for (const row of categoryRows) {
@@ -254,8 +262,8 @@ async function migrateCatalogIds(db: mysql.Pool) {
     categoryMap.set(String(row.id), id)
     await db.query(
       'INSERT INTO categories_new (id, name, active, sort_order) VALUES (?, ?, ?, ?)',
-      [id, row.name, row.active ? 1 : 0, Number(row.sort_order ?? 0)],
-    )
+      'INSERT INTO categories_new (id, name, active, sort_order, min_items) VALUES (?, ?, ?, ?, ?)',
+      [id, row.name, row.active ? 1 : 0, Number(row.sort_order ?? 0), Number(row.min_items ?? 0)],
   }
 
   await db.query(`
@@ -270,15 +278,15 @@ async function migrateCatalogIds(db: mysql.Pool) {
       previous_price INT NULL,
       image VARCHAR(255) NOT NULL,
       active TINYINT(1) NOT NULL DEFAULT 1
+      items INT NOT NULL DEFAULT 0,
+      active TINYINT(1) NOT NULL DEFAULT 1
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `)
   const [productRows] = await db.query<mysql.RowDataPacket[]>(
-    'SELECT id, name, category, brand, model, spec, price, previous_price, image, active FROM products',
-  )
+    'SELECT id, name, category, brand, model, spec, price, previous_price, image, items, active FROM products',
   const usedProducts = new Set<number>()
   for (const row of productRows) {
-    const seed = seedProducts.find((item) => item.name === String(row.name))
-    let id = seed?.id ?? Number(row.id)
+    let id = Number(row.id)
     if (!Number.isInteger(id) || id < 1 || usedProducts.has(id)) {
       id = 1
       while (usedProducts.has(id)) id += 1
@@ -287,19 +295,20 @@ async function migrateCatalogIds(db: mysql.Pool) {
     await db.query(
       `
       INSERT INTO products_new (id, name, category, brand, model, spec, price, previous_price, image, active)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO products_new (id, name, category, brand, model, spec, price, previous_price, image, items, active)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `,
       [
         id,
         row.name,
-        categoryMap.get(String(row.category)) ?? seed?.category ?? 1,
+        categoryMap.get(String(row.category)) ?? 1,
         row.brand,
         row.model,
         row.spec,
         Number(row.price),
         row.previous_price == null ? null : Number(row.previous_price),
         row.image,
-        row.active == null ? 1 : row.active ? 1 : 0,
+        Number(row.items ?? 0),
       ],
     )
   }
@@ -320,10 +329,10 @@ async function seedCategoriesIfEmpty() {
     await db.query(
       `
       INSERT IGNORE INTO categories (id, name, active, sort_order)
-      VALUES (?, ?, ?, ?)
+      INSERT IGNORE INTO categories (id, name, active, sort_order, min_items)
+      VALUES (?, ?, ?, ?, ?)
       `,
-      [category.id, category.name, category.active ? 1 : 0, category.sortOrder],
-    )
+      [category.id, category.name, category.active ? 1 : 0, category.sortOrder, category.minItems],
   }
 }
 
@@ -344,6 +353,8 @@ export function rowToProduct(row: ProductRow): Product {
     previousPrice: row.previous_price == null ? undefined : Number(row.previous_price),
     image: row.image,
     active: row.active == null ? true : Boolean(row.active),
+    items: Number(row.items ?? 0),
+    outOfStock: Number(row.out_of_stock ?? 1),
   }
 }
 
@@ -352,7 +363,7 @@ export async function listProducts(): Promise<Product[]> {
   const [rows] = await db.query<mysql.RowDataPacket[]>(
     `
     SELECT p.id, p.name, p.category, p.brand, p.model, p.spec, p.price, p.previous_price, p.image, p.active
-    FROM products p
+    SELECT p.id, p.name, p.category, p.brand, p.model, p.spec, p.price, p.previous_price, p.image, p.items, p.out_of_stock, p.active
     INNER JOIN categories c ON c.id = p.category
     ORDER BY p.name
     `,
@@ -372,13 +383,16 @@ export async function upsertProduct(product: Product): Promise<Product> {
     product.previousPrice ?? null,
     product.image,
     product.active !== false ? 1 : 0,
+    product.items,
+    product.outOfStock,
+    product.active !== false ? 1 : 0,
   ]
   let id = product.id
   if (id > 0) {
     await db.query(
       `
       UPDATE products
-      SET name = ?, category = ?, brand = ?, model = ?, spec = ?, price = ?, previous_price = ?, image = ?, active = ?
+      SET name = ?, category = ?, brand = ?, model = ?, spec = ?, price = ?, previous_price = ?, image = ?, items = ?, out_of_stock = ?, active = ?
       WHERE id = ?
       `,
       [...values, id],
@@ -386,9 +400,8 @@ export async function upsertProduct(product: Product): Promise<Product> {
   } else {
     const [result] = await db.query<mysql.ResultSetHeader>(
       `
-      INSERT INTO products (name, category, brand, model, spec, price, previous_price, image, active)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `,
+      INSERT INTO products (name, category, brand, model, spec, price, previous_price, image, items, out_of_stock, active)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       values,
     )
     id = result.insertId
@@ -413,7 +426,7 @@ export async function closeDb() {
 
 export async function exportProductsJson() {
   mkdirSync(dirname(jsonPath), { recursive: true })
-  let products = seedProducts
+  let products: Product[] = []
   try {
     products = await listProducts()
   } catch {
@@ -428,25 +441,4 @@ async function seedIfEmpty() {
   const [rows] = await db.query<mysql.RowDataPacket[]>('SELECT COUNT(*) AS total FROM products')
   const total = Number((rows[0] as { total: number }).total)
   if (total > 0) return
-
-  for (const product of seedProducts) {
-    await db.query(
-      `
-      INSERT INTO products (id, name, category, brand, model, spec, price, previous_price, image, active)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `,
-      [
-        product.id,
-        product.name,
-        product.category,
-        product.brand,
-        product.model,
-        product.spec,
-        product.price,
-        product.previousPrice ?? null,
-        product.image,
-        product.active !== false ? 1 : 0,
-      ],
-    )
-  }
 }

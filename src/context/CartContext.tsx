@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
-import { type Product } from '../data/site'
+import { isOutOfStock, type Product } from '../data/site'
 import { isActive } from '../lib/active'
 
 export type CartLine = {
@@ -32,12 +32,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       total,
       add(product: Product) {
         if (!isActive(product.active)) return
+        if (isOutOfStock(product)) return
+        const max = Number(product.items)
         setLines((current) => {
           const existing = current.find((line) => line.product.id === product.id)
           if (existing) {
             return current.map((line) =>
               line.product.id === product.id
-                ? { ...line, quantity: line.quantity + 1 }
+                ? { ...line, quantity: Math.min(line.quantity + 1, max) }
                 : line,
             )
           }

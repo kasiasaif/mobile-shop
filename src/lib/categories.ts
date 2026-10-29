@@ -6,7 +6,13 @@ import { readCatalogJson, useCatalogLive } from './catalogApi'
 function asCategory(item: CategoryRecord): CategoryRecord | null {
   const id = Number(item.id)
   if (!Number.isInteger(id) || id < 1) return null
-  return { ...item, id, active: isActive(item.active) }
+  const minItems = Number(item.minItems)
+  return {
+    ...item,
+    id,
+    active: isActive(item.active),
+    minItems: Number.isInteger(minItems) && minItems >= 0 ? minItems : 0,
+  }
 }
 
 export async function loadCategories(): Promise<CategoryRecord[]> {

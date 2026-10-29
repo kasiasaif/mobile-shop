@@ -15,8 +15,11 @@ export const navItems = [
 
 export {
   categories,
+  isBelowMinStock,
+  isOutOfStock,
   labelForCategory,
   seedCategories,
+  stockStatusLabel,
   type Brand,
   type Category,
   type CategoryRecord,

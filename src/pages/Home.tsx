@@ -47,9 +47,9 @@ export function Home() {
       )}
 
       <section className="shell">
-        <div className="service-list">
+        <div className="service-strip">
           {services.map((item) => (
-            <Link key={item.title} className="service-item" to={item.href}>
+            <Link key={item.title} className="service-card" to={item.href}>
               <strong>{item.title}</strong>
               <span>{item.body}</span>
             </Link>
