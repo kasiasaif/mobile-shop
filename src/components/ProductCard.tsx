@@ -12,7 +12,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const { categories } = useCategories()
   const quantity = lines.find((line) => line.product.id === product.id)?.quantity ?? 0
   const saved = (product.previousPrice ?? product.price) - product.price
-  const outOfStock = isOutOfStock(product)
+  const outOfStock = isOutOfStock(product, categories)
   const lowInStock = stockStatusLabel(product, categories) === 'Low in stock'
 
   return (

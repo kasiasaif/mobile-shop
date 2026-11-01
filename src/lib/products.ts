@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { type Product } from '../data/site'
+import { outOfStockForCategory, type Product } from '../data/site'
 import { isActive } from './active'
 import { readCatalogJson, useCatalogLive } from './catalogApi'
 import { loadCategories } from './categories'
@@ -39,7 +39,12 @@ export async function loadLiveProducts(): Promise<Product[]> {
   const liveCategoryIds = new Set(
     categories.filter((item) => isActive(item.active)).map((item) => item.id),
   )
-  return products.filter((item) => isActive(item.active) && liveCategoryIds.has(item.category))
+  return products
+    .filter((item) => isActive(item.active) && liveCategoryIds.has(item.category))
+    .map((item) => ({
+      ...item,
+      outOfStock: outOfStockForCategory(item.category, categories),
+    }))
 }
 
 export function useProducts() {

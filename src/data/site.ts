@@ -18,6 +18,7 @@ export {
   isBelowMinStock,
   isOutOfStock,
   labelForCategory,
+  outOfStockForCategory,
   seedCategories,
   stockStatusLabel,
   type Brand,

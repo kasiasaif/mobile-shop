@@ -4,19 +4,23 @@
     "name": "Batteries",
     "active": true,
     "sortOrder": 0,
-    "minItems": 5
+    "minItems": 5,
+    "outOfStock": 1
   },
   {
     "id": 5,
     "name": "Moazzams category",
     "active": false,
     "sortOrder": 0,
-    "minItems": 0
+    "minItems": 2,
+    "outOfStock": 1
   },
   {
     "id": 2,
     "name": "LCD",
     "active": true,
-    "sortOrder": 1
+    "sortOrder": 1,
+    "minItems": 2,
+    "outOfStock": 1
   }
 ]

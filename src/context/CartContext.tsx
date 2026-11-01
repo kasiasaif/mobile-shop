@@ -1,6 +1,7 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
 import { isOutOfStock, type Product } from '../data/site'
 import { isActive } from '../lib/active'
+import { useCategories } from '../lib/categories'
 
 export type CartLine = {
   product: Product
@@ -21,6 +22,7 @@ const CartContext = createContext<CartContextValue | null>(null)
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([])
+  const { categories } = useCategories()
 
   const value = useMemo(() => {
     const count = lines.reduce((sum, line) => sum + line.quantity, 0)
@@ -32,7 +34,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       total,
       add(product: Product) {
         if (!isActive(product.active)) return
-        if (isOutOfStock(product)) return
+        if (isOutOfStock(product, categories)) return
         const max = Number(product.items)
         setLines((current) => {
           const existing = current.find((line) => line.product.id === product.id)
@@ -63,7 +65,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setLines([])
       },
     }
-  }, [lines])
+  }, [categories, lines])
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }

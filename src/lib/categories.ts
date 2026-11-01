@@ -6,12 +6,15 @@ import { readCatalogJson, useCatalogLive } from './catalogApi'
 function asCategory(item: CategoryRecord): CategoryRecord | null {
   const id = Number(item.id)
   if (!Number.isInteger(id) || id < 1) return null
+  const raw = item as CategoryRecord & { out_of_stock?: unknown }
   const minItems = Number(item.minItems)
+  const outOfStock = Number(item.outOfStock ?? raw.out_of_stock)
   return {
     ...item,
     id,
     active: isActive(item.active),
     minItems: Number.isInteger(minItems) && minItems >= 0 ? minItems : 0,
+    outOfStock: Number.isInteger(outOfStock) && outOfStock >= 0 ? outOfStock : 1,
   }
 }
 
