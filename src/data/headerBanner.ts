@@ -62,6 +62,14 @@ export function headerBannerFontStack(font: string) {
   }
 }
 
+export function splitChars(text: string): string[] {
+  if (typeof Intl !== 'undefined' && 'Segmenter' in Intl) {
+    const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' })
+    return Array.from(segmenter.segment(text), (part) => part.segment)
+  }
+  return Array.from(text)
+}
+
 export function tickerInk(background: string) {
   const hex = background.replace('#', '')
   if (hex.length !== 6) return '#ffffff'

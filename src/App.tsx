@@ -7,6 +7,7 @@ import { Contact } from './pages/Contact'
 import { Home } from './pages/Home'
 import { NotFound } from './pages/NotFound'
 import { Shop } from './pages/Shop'
+import { Terms } from './pages/Terms'
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/work" element={<Navigate to="/shop" replace />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/terms" element={<Terms />} />
         <Route path="/admin" element={<AdminMoved />} />
         <Route path="*" element={<NotFound />} />
       </Route>

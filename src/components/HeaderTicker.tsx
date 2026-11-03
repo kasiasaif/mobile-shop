@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { headerBannerFontStack, withOpacity } from '../data/headerBanner'
+import { useEffect, useState, type CSSProperties } from 'react'
+import { headerBannerFontStack, splitChars, withOpacity } from '../data/headerBanner'
 import { useHeaderBanners } from '../lib/headerBanners'
 
 const dismissKey = 'tescgsm-header-banner-closed'
@@ -62,7 +62,11 @@ export function HeaderTicker() {
               fontWeight: banner.bold ? 700 : 400,
             }}
           >
-            {banner.text}
+            {splitChars(banner.text).map((char, i) => (
+              <span key={i} className="ticker-char" style={{ '--i': i } as CSSProperties}>
+                {char}
+              </span>
+            ))}
           </p>
         </div>
       </div>

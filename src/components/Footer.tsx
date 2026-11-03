@@ -5,14 +5,11 @@ import { navItems, site } from '../data/site'
 export function Footer() {
   return (
     <footer className="site-footer">
-      <div className="shell footer-grid">
-        <div>
-          <p className="brand">
-            <img className="brand-mark" src={logoUrl} alt="tescgsm" width={36} height={36} />
-            <span className="wordmark">{site.name}</span>
-          </p>
-          <p className="muted">{site.tagline} · {site.location}</p>
-        </div>
+      <div className="shell footer-row">
+        <Link className="brand" to="/">
+          <img className="brand-mark" src={logoUrl} alt="tescgsm" width={36} height={36} />
+          <span className="wordmark">{site.name}</span>
+        </Link>
 
         <nav aria-label="Footer">
           <Link to="/">Home</Link>
@@ -21,12 +18,14 @@ export function Footer() {
               {item.label}
             </Link>
           ))}
+          <Link to="/terms">Terms and conditions</Link>
         </nav>
 
-        <div className="footer-contact">
-          <a href={`mailto:${site.email}`}>{site.email}</a>
-          <p className="muted">Batteries and LCD for phone repair. More parts later.</p>
-        </div>
+        <a className="footer-email" href={`mailto:${site.email}`}>
+          {site.email}
+        </a>
+
+        <p className="footer-copy">© {new Date().getFullYear()} {site.name}</p>
       </div>
     </footer>
   )
