@@ -16,7 +16,7 @@ import {
   type CustomerKind,
 } from '../lib/account'
 import { OrderAmounts } from './OrderAmounts'
-import { checkDiscountCode, discountOff } from '../lib/vouchers'
+import { checkDiscountCode, discountOff, formatMoney } from '../lib/vouchers'
 
 const steps = [
   { id: 1, label: 'Sign in', title: 'Log in or create an account' },
