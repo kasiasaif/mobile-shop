@@ -4,6 +4,7 @@ import logoUrl from '../assets/logo.svg?url'
 import { useCart } from '../context/CartContext'
 import { navItems, site } from '../data/site'
 import { useCategories } from '../lib/categories'
+import { HeaderTicker } from './HeaderTicker'
 
 export function Header() {
   const [open, setOpen] = useState(false)
@@ -133,15 +134,7 @@ export function Header() {
         </div>
       </div>
 
-      <div className="category-bar">
-        <div className="shell category-row">
-          {categories.map((category) => (
-            <Link key={category.id} to={`/shop?category=${encodeURIComponent(category.id)}`} onClick={closeMenu}>
-              {category.name}
-            </Link>
-          ))}
-        </div>
-      </div>
+      <HeaderTicker />
     </header>
   )
 }

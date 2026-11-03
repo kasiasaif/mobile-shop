@@ -2,6 +2,13 @@ export type Category = number
 
 export type Brand = string
 
+export type BrandRecord = {
+  id: number
+  name: string
+  image: string
+  active: boolean
+}
+
 export type CategoryRecord = {
   id: number
   name: string
@@ -31,7 +38,12 @@ export const seedCategories: CategoryRecord[] = [
   { id: 2, name: 'LCD', active: true, sortOrder: 1, minItems: 0, outOfStock: 1 },
 ]
 
-export const brands = ['Apple', 'Samsung'] as const
+export const seedBrands: BrandRecord[] = [
+  { id: 1, name: 'Apple', image: 'images/brand-apple.svg', active: true },
+  { id: 2, name: 'Samsung', image: 'images/brand-samsung.svg', active: true },
+]
+
+export const brands = seedBrands.map((item) => item.name)
 
 export const categories: Category[] = seedCategories.map((item) => item.id)
 
