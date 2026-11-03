@@ -169,6 +169,81 @@ code {
   font: inherit;
 }
 
+.header-account {
+  position: relative;
+}
+
+.account-toggle {
+  display: grid;
+  place-items: center;
+  width: 2.45rem;
+  height: 2.45rem;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.account-toggle.is-open,
+.account-toggle:hover,
+.account-toggle:focus-visible {
+  border-color: var(--ink);
+}
+
+.account-toggle svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.account-drop {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  right: 0;
+  z-index: 20;
+  min-width: 12.5rem;
+  padding: 0.35rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 14px 36px rgb(0 0 0 / 14%);
+}
+
+.account-drop-name {
+  margin: 0;
+  padding: 0.5rem 0.7rem 0.55rem;
+  border-bottom: 1px solid var(--line);
+  font-weight: 800;
+}
+
+.account-drop a,
+.account-drop button {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  padding: 0.55rem 0.7rem;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.account-drop a:hover,
+.account-drop button:hover,
+.account-drop a:focus-visible,
+.account-drop button:focus-visible {
+  background: #f4f4f4;
+}
+
 .header-actions {
   display: flex;
   align-items: center;
@@ -260,8 +335,19 @@ code {
   box-shadow: 0 6px 14px -4px rgb(0 0 0 / 22%);
 }
 
+.header-ticker-bg {
+  position: absolute;
+  inset: 0;
+}
+
+.header-ticker-bg.is-out {
+  z-index: 1;
+  animation: ticker-bg-fade 0.7s ease forwards;
+}
+
 .header-ticker-row {
   position: relative;
+  z-index: 2;
   height: 45px;
 }
 
@@ -273,6 +359,7 @@ code {
 
 .header-ticker-close {
   position: absolute;
+  z-index: 3;
   top: 50%;
   right: 0.6rem;
   display: grid;
@@ -317,12 +404,35 @@ code {
   animation: ticker-crash 3.2s linear both;
 }
 
+.header-ticker-text.is-leaving,
+.header-ticker-text.is-leaving .ticker-char {
+  animation: ticker-swap-out 0.45s ease forwards;
+}
+
 .ticker-char {
   display: inline-block;
   white-space: pre;
-  animation:
-    ticker-wobble-wall 0.6s ease-out calc(0.75s + var(--i) * 14ms),
-    ticker-wobble-stop 0.7s ease-out calc(2.25s + var(--i) * 14ms);
+  animation: ticker-wave 0.45s ease-out calc(0.74s + var(--i) * 16ms);
+}
+
+@keyframes ticker-bg-fade {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ticker-swap-out {
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-14px);
+  }
+}
+
+@keyframes ticker-swap-out-left {
+  to {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
 }
 
 @keyframes ticker-crash {
@@ -343,68 +453,84 @@ code {
   30% {
     left: 0%;
     transform: translateX(0) scaleX(1.08) scaleY(0.95);
+    animation-timing-function: cubic-bezier(0.2, 0.85, 0.2, 1);
   }
-  34% {
-    left: 0%;
-    transform: translateX(0) scaleX(0.97) scaleY(1.02);
+  42%,
+  100% {
+    left: 50%;
+    transform: translateX(-50%) scaleX(1);
   }
-  42% {
+}
+
+@keyframes ticker-crash-left {
+  0% {
+    left: 100%;
+    transform: translateX(0) scaleX(1);
+    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+  }
+  23% {
     left: 0%;
     transform: translateX(0) scaleX(1);
-    animation-timing-function: cubic-bezier(0.3, 1.45, 0.5, 1);
+    animation-timing-function: ease-out;
   }
-  70% {
-    left: 50%;
-    transform: translateX(-50%) scaleX(1);
+  26% {
+    left: 0%;
+    transform: translateX(0) scaleX(0.82) scaleY(1.12);
   }
+  30% {
+    left: 0%;
+    transform: translateX(0) scaleX(1.08) scaleY(0.95);
+    animation-timing-function: cubic-bezier(0.2, 0.85, 0.2, 1);
+  }
+  42%,
   100% {
     left: 50%;
     transform: translateX(-50%) scaleX(1);
   }
 }
 
-@keyframes ticker-wobble-wall {
+@keyframes ticker-wave {
   0%,
   100% {
     transform: none;
   }
-  15% {
-    transform: translateY(-4px) rotate(-14deg);
-  }
-  35% {
-    transform: translateY(2px) rotate(10deg);
-  }
-  55% {
-    transform: translateY(-1px) rotate(-6deg);
-  }
-  75% {
-    transform: rotate(3deg);
-  }
-}
-
-@keyframes ticker-wobble-stop {
-  0%,
-  100% {
-    transform: none;
-  }
-  15% {
-    transform: translateY(-3px) rotate(9deg);
-  }
-  35% {
-    transform: translateY(1px) rotate(-8deg);
-  }
-  55% {
-    transform: rotate(5deg);
-  }
-  75% {
-    transform: rotate(-2deg);
+  45% {
+    transform: translateY(-5px);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .header-ticker-text,
-  .ticker-char {
+  .ticker-char,
+  .header-ticker-bg {
     animation: none;
+  }
+
+  .header-ticker-text.is-leaving,
+  .header-ticker-bg.is-out {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  html {
+    font-size: 14px;
+  }
+
+  .header-ticker-inner {
+    inset: 0 2.25rem 0 0;
+  }
+
+  .header-ticker-text {
+    left: 0;
+    font-size: 12px;
+    transform: none;
+    animation-name: ticker-crash-left;
+  }
+
+  .header-ticker-text.is-leaving,
+  .header-ticker-text.is-leaving .ticker-char {
+    animation-name: ticker-swap-out-left;
   }
 }
 
@@ -450,34 +576,98 @@ code {
 }
 
 .promo-track {
-  display: flex;
+  position: relative;
   height: 100%;
   min-height: inherit;
-  transition: transform 0.55s ease;
 }
 
 .promo-slide {
-  position: relative;
-  flex: 0 0 100%;
+  position: absolute;
+  inset: 0;
   min-height: inherit;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.promo-slide.is-active {
+  position: relative;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  z-index: 1;
+  background: #111;
+}
+
+.promo-slide.is-leaving {
+  z-index: 2;
+  opacity: 1;
+  visibility: visible;
+}
+
+.promo-slide.is-leaving .promo-banner-copy {
+  animation: promo-copy-out 0.5s ease forwards;
+}
+
+.promo-banner.is-fading .promo-slide.is-leaving .promo-banner-media {
+  animation: promo-fade 0.9s ease forwards;
+}
+
+.promo-banner.is-out .promo-slide.is-entering .promo-banner-copy,
+.promo-banner.is-bg .promo-slide.is-entering .promo-banner-copy {
+  opacity: 0;
+}
+
+.promo-banner.is-in .promo-slide.is-entering .promo-banner-copy {
+  animation: promo-copy-in 0.48s ease forwards;
+}
+
+.promo-slide.is-entering {
+  z-index: 1;
+}
+
+@keyframes promo-copy-out {
+  to {
+    opacity: 0;
+    transform: translateY(-110%);
+  }
+}
+
+@keyframes promo-fade {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes promo-copy-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.6rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .promo-banner-media {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  background: #111;
 }
 
 .promo-banner-media img {
   position: absolute;
-  top: 50%;
-  right: 0;
-  height: 130%;
-  width: auto;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   max-width: none;
-  transform: translateY(-50%);
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 28%);
-  mask-image: linear-gradient(90deg, transparent 0%, #000 28%);
+  object-fit: cover;
+  object-position: right 8%;
+  transform: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 38%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 38%);
 }
 
 .promo-banner-copy {
@@ -520,7 +710,7 @@ code {
   position: absolute;
   left: 50%;
   bottom: 1.1rem;
-  z-index: 2;
+  z-index: 4;
   display: flex;
   gap: 0.45rem;
   transform: translateX(-50%);
@@ -534,6 +724,7 @@ code {
   border-radius: 999px;
   background: rgb(255 255 255 / 45%);
   cursor: pointer;
+  transition: background 0.35s ease, width 0.35s ease;
 }
 
 .promo-dots button.is-active {
@@ -542,9 +733,18 @@ code {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .promo-track {
-    transition: none;
+  .promo-slide.is-leaving .promo-banner-media,
+  .promo-slide.is-leaving .promo-banner-copy,
+  .promo-slide.is-entering .promo-banner-copy {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
+
+  .promo-banner.is-fading .promo-slide.is-leaving .promo-banner-media {
+    opacity: 0;
+  }
+
 }
 
 .button {
@@ -732,9 +932,19 @@ code {
   flex: 1;
 }
 
-.shop-sidebar {
+.shop-side {
   position: sticky;
   top: 5.35rem;
+  display: grid;
+  align-content: start;
+  gap: 0.85rem;
+}
+
+html:has(.header-ticker) .shop-side {
+  top: calc(5.35rem + 45px);
+}
+
+.shop-sidebar {
   display: grid;
   align-content: start;
   gap: 0;
@@ -745,8 +955,431 @@ code {
   box-shadow: 0 8px 24px rgb(0 0 0 / 5%);
 }
 
-html:has(.header-ticker) .shop-sidebar {
+.account-card {
+  padding: 0.85rem 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 5%);
+}
+
+.account-card-body {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+}
+
+.account-card-body label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.account-card-body input {
+  width: 100%;
+  min-height: 2.3rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 0.65rem;
+  font: inherit;
+  font-weight: 500;
+}
+
+.account-card-name {
+  margin: 0;
+  font-weight: 700;
+}
+
+.account-card-email {
+  margin: 0;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.account-card .checkout-error {
+  margin: 0;
+}
+
+.account-card-link {
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.account-card-link:hover {
+  text-decoration: underline;
+}
+
+.account-login {
+  max-width: 32rem;
+}
+
+.account-login .button {
+  margin-top: 1rem;
+}
+
+.account-layout {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.account-menu {
+  display: grid;
+  gap: 0.75rem;
+  position: sticky;
+  top: 5.35rem;
+}
+
+html:has(.header-ticker) .account-menu {
   top: calc(5.35rem + 45px);
+}
+
+.account-nav {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.45rem;
+}
+
+.account-nav button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  padding: 0.7rem 0.75rem;
+  cursor: pointer;
+}
+
+.account-nav button span {
+  min-width: 1.4rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: #f3f3f3;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.account-nav button:hover,
+.account-nav button:focus-visible {
+  background: rgb(17 17 17 / 4%);
+}
+
+.account-nav button.is-active,
+.account-nav button.is-active:hover {
+  background: rgb(17 17 17 / 6%);
+  color: var(--ink);
+}
+
+.account-nav button.is-active span {
+  background: #f3f3f3;
+  color: var(--ink);
+}
+
+.account-panel,
+.account-order {
+  padding: 1.15rem 1.2rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 5%);
+}
+
+.account-order {
+  padding: 0;
+  overflow: hidden;
+}
+
+.account-order-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 6.75rem 4.5rem 1.15rem;
+  align-items: center;
+  gap: 0.65rem 0.85rem;
+  width: 100%;
+  min-height: 3.4rem;
+  padding: 0.55rem 0.9rem 0.55rem 1.05rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.account-order-summary:hover {
+  background: var(--surface);
+}
+
+.account-order-id {
+  display: grid;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.account-order-id .muted {
+  font-size: 0.8rem;
+}
+
+.account-order-status,
+.account-order-amount {
+  justify-self: end;
+  width: 100%;
+  line-height: 1.2;
+  font-size: 0.95rem;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.account-order-status {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.account-order-amount {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.order-amounts {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0.85rem 0 0;
+}
+
+.order-amounts p {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0;
+}
+
+.order-amounts-paid {
+  font-size: 1.05rem;
+}
+
+.account-order-arrow {
+  width: 1.05rem;
+  height: 1.05rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.15s ease;
+}
+
+.account-order.is-open .account-order-arrow {
+  transform: rotate(90deg);
+}
+
+.account-order-body {
+  padding: 0.9rem 1.05rem 1.1rem;
+  border-top: 1px solid var(--line);
+}
+
+.account-panel h2,
+.account-orders h2 {
+  margin: 0 0 0.9rem;
+  font-size: 1.25rem;
+}
+
+.account-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.account-panel-head h2 {
+  margin: 0;
+}
+
+.account-panel label,
+.account-login label {
+  display: grid;
+  gap: 0.3rem;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.account-panel input,
+.account-login input {
+  width: 100%;
+  min-height: 2.6rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0 0.75rem;
+  font: inherit;
+  font-weight: 500;
+}
+
+.account-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.account-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.account-details {
+  display: grid;
+  gap: 0.85rem;
+  margin: 1rem 0 0;
+}
+
+.account-details div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.account-details dt {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.account-details dd {
+  margin: 0;
+}
+
+.account-orders {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.account-order header,
+.account-order > ul li,
+.account-order-body ul li,
+.account-order-total {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.account-order-body ul li strong {
+  flex: none;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.account-order header {
+  align-items: center;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.account-order-ref {
+  margin: 0;
+  font-weight: 800;
+}
+
+.account-order header .muted,
+.account-order-total {
+  margin: 0;
+}
+
+.order-progress {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.order-progress li {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.order-progress li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: calc(1.65rem / 2);
+  left: calc(50% + 1.65rem / 2);
+  width: calc(100% - 1.65rem);
+  height: 2px;
+  background: var(--line);
+  transform: translateY(-50%);
+}
+
+.order-progress li span {
+  position: relative;
+  z-index: 1;
+  width: 1.65rem;
+  height: 1.65rem;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  background: #fff;
+  font-size: 0.75rem;
+}
+
+.order-progress li.is-done,
+.order-progress li.is-current {
+  color: var(--ink);
+}
+
+.order-progress li.is-done span,
+.order-progress li.is-current span {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+
+.order-progress li.is-current span {
+  box-shadow: 0 0 0 4px var(--surface);
+}
+
+.account-order ul {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+}
+
+.account-order > ul li + li {
+  margin-top: 0.65rem;
+}
+
+.account-order small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.account-order-total {
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+  font-weight: 700;
 }
 
 .shop-nav {
@@ -792,12 +1425,17 @@ html:has(.header-ticker) .shop-sidebar {
   opacity: 0.55;
 }
 
+.shop-brand-name {
+  min-width: 0;
+}
+
 .shop-brand-mark {
-  width: 1.25rem;
-  height: 1.25rem;
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
+  width: auto;
+  height: 1.15rem;
+  flex: none;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
 }
 
 .shop-brand-mark img,
@@ -807,6 +1445,15 @@ html:has(.header-ticker) .shop-sidebar {
   object-fit: contain;
   object-position: center;
   display: block;
+}
+
+.shop-brand-mark img.shop-nav-icon[src*="samsung"],
+.shop-brand-mark img.shop-nav-icon[src*="sony"] {
+  width: auto;
+  height: auto;
+  max-width: 2.75rem;
+  max-height: 0.7rem;
+  opacity: 1;
 }
 
 .shop-nav-link:hover,
@@ -1244,6 +1891,19 @@ html:has(.header-ticker) .shop-sidebar {
   margin: 0;
 }
 
+.checkout-breakdown {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0 0 0.35rem;
+  color: var(--muted);
+}
+
+.checkout-breakdown p {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+}
+
 .checkout-overlay {
   position: fixed;
   inset: 0;
@@ -1655,8 +2315,108 @@ html:has(.header-ticker) .shop-sidebar {
   margin-bottom: 0.65rem;
 }
 
+.checkout-discount,
+.checkout-payment {
+  grid-column: 1 / -1;
+}
+
 .checkout-review-card p {
   margin-bottom: 0.35rem;
+}
+
+.discount-field {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 0.85rem;
+  row-gap: 0.35rem;
+}
+
+.discount-field > label {
+  display: block;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.discount-field > .discount-hint,
+.discount-field > .checkout-error {
+  grid-column: 2;
+}
+
+.discount-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.7rem;
+  padding: 0.2rem 0.2rem 0.2rem 0.95rem;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+}
+
+.discount-row input {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+  height: 2.2rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  letter-spacing: 0.04em;
+}
+
+.discount-row input:focus {
+  outline: none;
+}
+
+.discount-row:focus-within {
+  box-shadow: 0 0 0 3px rgb(17 17 17 / 12%);
+}
+
+.discount-row .button {
+  flex-shrink: 0;
+  min-width: 5.2rem;
+  min-height: 2.2rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+}
+
+.discount-row .button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.discount-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.checkout-code {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0.7rem 0.85rem;
+  border-radius: 999px;
+  background: #eef6ef;
+  color: #1f7a32;
+  font-weight: 600;
+}
+
+.discount-remove {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .checkout-lines {
@@ -1739,6 +2499,32 @@ html:has(.header-ticker) .shop-sidebar {
   }
 }
 
+.order-success {
+  max-width: 40rem;
+}
+
+.order-success .checkout-review-card {
+  margin: 0.4rem 0 1.4rem;
+}
+
+.order-success .checkout-review-card h2 {
+  margin-bottom: 0.65rem;
+  font-size: 1.15rem;
+}
+
+.checkout-signed-in {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem 1rem;
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fafafa;
+}
+
 .terms > * {
   max-width: 46rem;
 }
@@ -1772,18 +2558,6 @@ html:has(.header-ticker) .shop-sidebar {
     height: 11rem;
   }
 
-  .promo-banner-media img {
-    top: 0;
-    right: 0;
-    height: 100%;
-    width: 100%;
-    transform: none;
-    object-fit: cover;
-    object-position: center right;
-    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 38%);
-    mask-image: linear-gradient(90deg, transparent 0%, #000 38%);
-  }
-
   .promo-banner-copy {
     padding: 0.75rem 0 1.15rem;
     justify-content: center;
@@ -1795,8 +2569,14 @@ html:has(.header-ticker) .shop-sidebar {
   }
 
   .promo-banner h1 {
-    font-size: 1.2rem;
+    font-size: 1.05rem;
     margin-bottom: 0.45rem;
+  }
+
+  .checkout-form,
+  .checkout-form label,
+  .checkout-form input {
+    font-size: 0.92rem;
   }
 
   .promo-banner .button {
@@ -1851,8 +2631,17 @@ html:has(.header-ticker) .shop-sidebar {
     font-weight: 700;
   }
 
-  .mobile-links a {
+  .mobile-links a,
+  .mobile-links button {
+    border: 0;
+    background: none;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    font-weight: 700;
+    text-align: left;
     text-decoration: none;
+    cursor: pointer;
   }
 
   .mobile-label {
@@ -1890,6 +2679,27 @@ html:has(.header-ticker) .shop-sidebar {
 
   .shop-layout {
     grid-template-columns: 1fr;
+  }
+
+  .shop-side {
+    position: static;
+  }
+
+  .account-layout,
+  .account-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .account-order-summary {
+    grid-template-columns: minmax(0, 1fr) 4.5rem 1.15rem;
+  }
+
+  .account-order-status {
+    display: none;
+  }
+
+  .account-menu {
+    position: static;
   }
 
   .shop-sidebar {

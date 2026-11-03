@@ -6,6 +6,8 @@ import { Cart } from './pages/Cart'
 import { Contact } from './pages/Contact'
 import { Home } from './pages/Home'
 import { NotFound } from './pages/NotFound'
+import { OrderSuccess } from './pages/OrderSuccess'
+import { Account } from './pages/Account'
 import { Shop } from './pages/Shop'
 import { Terms } from './pages/Terms'
 
@@ -16,6 +18,8 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/order/thanks" element={<OrderSuccess />} />
+        <Route path="/account" element={<Account />} />
         <Route path="/work" element={<Navigate to="/shop" replace />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />

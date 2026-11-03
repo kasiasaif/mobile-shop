@@ -71,7 +71,7 @@ export function Cart() {
               <span>Total</span>
               <strong>{formatPrice(total)}</strong>
             </p>
-            <p className="muted">You need an account to place an order — private or business.</p>
+            <p className="muted">Log in or create an account to place this order.</p>
             <button className="button button-solid button-block" type="button" onClick={() => setCheckoutOpen(true)}>
               Place order
             </button>

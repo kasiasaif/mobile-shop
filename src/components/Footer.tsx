@@ -18,6 +18,7 @@ export function Footer() {
               {item.label}
             </Link>
           ))}
+          <Link to="/account">Account</Link>
           <Link to="/terms">Terms and conditions</Link>
         </nav>
 

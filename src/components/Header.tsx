@@ -1,10 +1,91 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import logoUrl from '../assets/logo.svg?url'
 import { useCart } from '../context/CartContext'
 import { navItems, site } from '../data/site'
+import { accountForSession, displayName, signOutCustomer, syncShopAccount, watchSession } from '../lib/account'
 import { useCategories } from '../lib/categories'
 import { HeaderTicker } from './HeaderTicker'
+
+function AccountMenu({ onNavigate }: { onNavigate: () => void }) {
+  const [open, setOpen] = useState(false)
+  const [account, setAccount] = useState(accountForSession)
+  const rootRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => watchSession(() => setAccount(accountForSession())), [])
+
+  useEffect(() => {
+    void syncShopAccount(false)
+  }, [])
+
+  useEffect(() => {
+    if (!open) return
+    function onPointer(event: MouseEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false)
+    }
+    function onKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('mousedown', onPointer)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onPointer)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  function close() {
+    setOpen(false)
+    onNavigate()
+  }
+
+  return (
+    <div className="header-account" ref={rootRef}>
+      <button
+        className={open ? 'account-toggle is-open' : 'account-toggle'}
+        type="button"
+        aria-expanded={open}
+        aria-haspopup="menu"
+        aria-label={account ? 'Account menu' : 'Log in'}
+        onClick={() => setOpen((value) => !value)}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="8" r="3.25" />
+          <path d="M5.2 19.2a6.8 6.8 0 0 1 13.6 0" />
+        </svg>
+      </button>
+      {open ? (
+        <div className="account-drop" role="menu">
+          {account ? (
+            <>
+              <p className="account-drop-name">{displayName(account)}</p>
+              <Link role="menuitem" to="/account" onClick={close}>
+                My profile
+              </Link>
+              <Link role="menuitem" to="/account?tab=orders" onClick={close}>
+                My orders
+              </Link>
+              <button
+                role="menuitem"
+                type="button"
+                onClick={() => {
+                  signOutCustomer()
+                  setOpen(false)
+                }}
+              >
+                Sign out
+              </button>
+            </>
+          ) : (
+            <Link role="menuitem" to="/account" onClick={close}>
+              Log in
+            </Link>
+          )}
+        </div>
+      ) : null}
+    </div>
+  )
+}
 
 export function Header() {
   const [open, setOpen] = useState(false)
@@ -90,6 +171,7 @@ export function Header() {
               </NavLink>
             ))}
           </nav>
+          <AccountMenu onNavigate={closeMenu} />
           <Link className="cart-pill" to="/cart" onClick={closeMenu}>
             Cart {count}
           </Link>

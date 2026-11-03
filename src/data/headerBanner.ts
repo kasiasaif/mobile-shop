@@ -36,6 +36,16 @@ export function withOpacity(hex: string, opacity: number) {
   return `rgb(${(n >> 16) & 255} ${(n >> 8) & 255} ${n & 255} / ${parseOpacity(opacity)}%)`
 }
 
+/** Colour mixed with the white header at the banner opacity, kept solid so the fade has no gap. */
+export function bannerPaint(hex: string, opacity: number) {
+  const raw = hex.replace('#', '')
+  if (!/^[0-9a-fA-F]{6}$/.test(raw)) return hex
+  const n = Number.parseInt(raw, 16)
+  const amount = parseOpacity(opacity) / 100
+  const mix = (channel: number) => Math.round(channel * amount + 255 * (1 - amount))
+  return `rgb(${mix((n >> 16) & 255)} ${mix((n >> 8) & 255)} ${mix(n & 255)})`
+}
+
 export function parseHeaderBannerFont(value: unknown): HeaderBannerFont {
   const raw = String(value ?? '')
   return headerBannerFonts.includes(raw as HeaderBannerFont) ? (raw as HeaderBannerFont) : 'Plus Jakarta Sans'

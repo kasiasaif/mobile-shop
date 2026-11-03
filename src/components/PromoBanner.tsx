@@ -2,24 +2,81 @@ import { useEffect, useRef, useState, type TouchEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { type Banner } from '../data/banner'
 
+const holdMs = 5000
+const textOutMs = 700
+const bgMs = 900
+const textInMs = 600
+const swapMs = textOutMs + bgMs + textInMs
+
+type Phase = 'out' | 'bg' | 'in'
+
 export function PromoBanner({ banners }: { banners: Banner[] }) {
   const [index, setIndex] = useState(0)
-  const [paused, setPaused] = useState(false)
+  const [leaving, setLeaving] = useState<number | null>(null)
+  const [phase, setPhase] = useState<Phase | null>(null)
   const touchStartX = useRef<number | null>(null)
+  const indexRef = useRef(0)
   const total = banners.length
+  const armRef = useRef<(delay: number) => void>(() => {})
+  const showRef = useRef<(next: number) => void>(() => {})
 
   useEffect(() => {
-    if (total < 2 || paused) return
-    const timer = window.setInterval(() => {
-      setIndex((value) => (value + 1) % total)
-    }, 6500)
-    return () => window.clearInterval(timer)
-  }, [paused, total])
+    indexRef.current = 0
+    setIndex(0)
+    setLeaving(null)
+    setPhase(null)
+  }, [total])
+
+  useEffect(() => {
+    if (total < 2) return
+    let timer = 0
+    const arm = (delay: number) => {
+      window.clearTimeout(timer)
+      timer = window.setTimeout(() => {
+        showRef.current((indexRef.current + 1) % total)
+      }, delay)
+    }
+    armRef.current = arm
+    arm(holdMs)
+    return () => window.clearTimeout(timer)
+  }, [total])
+
+  useEffect(() => {
+    if (leaving == null) return
+    const toBg = window.setTimeout(() => setPhase('bg'), textOutMs)
+    const toIn = window.setTimeout(() => setPhase('in'), textOutMs + bgMs)
+    const done = window.setTimeout(() => {
+      setLeaving(null)
+      setPhase(null)
+    }, swapMs)
+    return () => {
+      window.clearTimeout(toBg)
+      window.clearTimeout(toIn)
+      window.clearTimeout(done)
+    }
+  }, [leaving, index])
 
   if (total === 0) return null
 
+  function show(next: number) {
+    const normalized = (next + total) % total
+    const current = indexRef.current
+    if (normalized === current || leaving != null) return
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    indexRef.current = normalized
+    setIndex(normalized)
+    if (reduce) {
+      armRef.current(holdMs)
+      return
+    }
+    setLeaving(current)
+    setPhase('out')
+    armRef.current(holdMs + swapMs)
+  }
+  showRef.current = show
+
   function goTo(next: number) {
-    setIndex((next + total) % total)
+    show(next)
   }
 
   function onTouchStart(event: TouchEvent<HTMLElement>) {
@@ -37,27 +94,27 @@ export function PromoBanner({ banners }: { banners: Banner[] }) {
 
   return (
     <section
-      className="promo-banner"
+      className={phase == null ? 'promo-banner' : `promo-banner is-${phase} is-fading`}
       aria-roledescription="carousel"
       aria-label="Promotions"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)}
-      onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
-          setPaused(false)
-        }
-      }}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
-      <div className="promo-track" style={{ transform: `translateX(-${index * 100}%)` }}>
+      <div className="promo-track">
         {banners.map((banner, slideIndex) => {
           const active = slideIndex === index
+          const outgoing = slideIndex === leaving
+          const className = active
+            ? leaving == null
+              ? 'promo-slide is-active'
+              : 'promo-slide is-active is-entering'
+            : outgoing
+              ? 'promo-slide is-leaving'
+              : 'promo-slide'
           return (
             <article
               key={banner.id}
-              className={active ? 'promo-slide is-active' : 'promo-slide'}
+              className={className}
               aria-hidden={!active}
               aria-roledescription="slide"
               aria-label={`${slideIndex + 1} of ${total}`}
@@ -86,17 +143,20 @@ export function PromoBanner({ banners }: { banners: Banner[] }) {
 
       {total > 1 ? (
         <div className="promo-dots" role="tablist" aria-label="Banner slides">
-          {banners.map((banner, slideIndex) => (
-            <button
-              key={banner.id}
-              type="button"
-              role="tab"
-              aria-label={`Show slide ${slideIndex + 1}`}
-              aria-selected={slideIndex === index}
-              className={slideIndex === index ? 'is-active' : ''}
-              onClick={() => goTo(slideIndex)}
-            />
-          ))}
+          {banners.map((banner, slideIndex) => {
+            const lit = slideIndex === (phase === 'out' && leaving != null ? leaving : index)
+            return (
+              <button
+                key={banner.id}
+                type="button"
+                role="tab"
+                aria-label={`Show slide ${slideIndex + 1}`}
+                aria-selected={lit}
+                className={lit ? 'is-active' : ''}
+                onClick={() => goTo(slideIndex)}
+              />
+            )
+          })}
         </div>
       ) : null}
     </section>

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import { adminUrl } from '../config'
 
-function catalogUrl(path: string) {
+export function shopApiUrl(path: string) {
   if (import.meta.env.DEV) return path
   return `${adminUrl.replace(/\/$/, '')}${path}`
 }
 
 export async function readCatalogJson<T>(path: string, fallback: string): Promise<T> {
   try {
-    const response = await fetch(catalogUrl(path), { cache: 'no-store' })
+    const response = await fetch(shopApiUrl(path), { cache: 'no-store' })
     if (response.ok) return (await response.json()) as T
   } catch {
     // Admin may be asleep; use the last exported JSON.

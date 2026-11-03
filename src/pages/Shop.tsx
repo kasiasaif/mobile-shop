@@ -79,6 +79,7 @@ export function Shop() {
           <p className="lede">Search a model such as iPhone 11 or Galaxy A15, or use the filters on the left.</p>
         </div>
         <div className="shop-layout">
+        <div className="shop-side">
         <aside className="shop-sidebar" aria-label="Browse parts">
           <nav className="shop-nav" aria-label="Category">
             <p className="shop-nav-label">Category</p>
@@ -121,6 +122,7 @@ export function Shop() {
                 aria-current={activeBrand === brand.name ? 'page' : undefined}
                 onClick={() => setBrand(brand.name)}
               >
+                <span className="shop-brand-name">{brand.name}</span>
                 <span className="shop-brand-mark">
                   {brand.image ? (
                     <img className="shop-nav-icon" src={brand.image} alt="" />
@@ -128,7 +130,6 @@ export function Shop() {
                     <BrandIcon brand={brand.name} />
                   )}
                 </span>
-                {brand.name}
               </button>
             ))}
           </nav>
@@ -164,6 +165,7 @@ export function Shop() {
             </button>
           </nav>
         </aside>
+        </div>
 
         <div className="shop-main">
           {status === 'loading' ? <p className="muted">Loading parts…</p> : null}
