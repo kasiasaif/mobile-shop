@@ -257,6 +257,7 @@ code {
   height: 45px;
   overflow: hidden;
   flex-shrink: 0;
+  box-shadow: 0 6px 14px -4px rgb(0 0 0 / 22%);
 }
 
 .header-ticker-row {
