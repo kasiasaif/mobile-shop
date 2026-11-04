@@ -310,6 +310,12 @@ code {
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
+.menu-toggle.is-open {
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #fff;
+}
+
 .menu-toggle.is-open .burger span:nth-child(1) {
   transform: translateY(7px) rotate(45deg);
 }
@@ -606,20 +612,15 @@ code {
 }
 
 .promo-slide.is-leaving .promo-banner-copy {
-  animation: promo-copy-out 0.5s ease forwards;
+  animation: promo-copy-out 0.7s ease forwards;
 }
 
-.promo-banner.is-fading .promo-slide.is-leaving .promo-banner-media {
-  animation: promo-fade 0.9s ease forwards;
+.promo-slide.is-leaving .promo-banner-media {
+  animation: promo-fade 0.7s ease forwards;
 }
 
-.promo-banner.is-out .promo-slide.is-entering .promo-banner-copy,
-.promo-banner.is-bg .promo-slide.is-entering .promo-banner-copy {
-  opacity: 0;
-}
-
-.promo-banner.is-in .promo-slide.is-entering .promo-banner-copy {
-  animation: promo-copy-in 0.48s ease forwards;
+.promo-slide.is-entering .promo-banner-copy {
+  animation: promo-copy-in 0.7s ease forwards;
 }
 
 .promo-slide.is-entering {
@@ -659,15 +660,14 @@ code {
 
 .promo-banner-media img {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  top: 50%;
+  right: 0;
+  height: 130%;
+  width: auto;
   max-width: none;
-  object-fit: cover;
-  object-position: right 8%;
-  transform: none;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 38%);
-  mask-image: linear-gradient(90deg, transparent 0%, #000 38%);
+  transform: translateY(-50%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 28%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 28%);
 }
 
 .promo-banner-copy {
@@ -739,10 +739,6 @@ code {
     animation: none;
     opacity: 1;
     transform: none;
-  }
-
-  .promo-banner.is-fading .promo-slide.is-leaving .promo-banner-media {
-    opacity: 0;
   }
 
 }
@@ -1217,6 +1213,7 @@ html:has(.header-ticker) .account-menu {
   min-height: 2.6rem;
   border: 1px solid var(--line);
   border-radius: 10px;
+  background: var(--surface);
   padding: 0 0.75rem;
   font: inherit;
   font-weight: 500;
@@ -1989,21 +1986,6 @@ html:has(.header-ticker) .account-menu {
   }
 }
 
-.notice-close {
-  display: grid;
-  place-items: center;
-  padding: 0;
-}
-
-.notice-close svg {
-  width: 1.05rem;
-  height: 1.05rem;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.2;
-  stroke-linecap: round;
-}
-
 .notice-body {
   padding: 0 1.5rem 1.5rem;
   color: var(--muted);
@@ -2066,16 +2048,26 @@ html:has(.header-ticker) .account-menu {
 }
 
 .checkout-close {
+  display: grid;
+  place-items: center;
   width: 2.4rem;
   height: 2.4rem;
   flex-shrink: 0;
+  padding: 0;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 50%;
   background: #fff;
-  font: inherit;
-  font-size: 1.6rem;
-  line-height: 1;
+  color: var(--ink);
   cursor: pointer;
+}
+
+.checkout-close svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
 }
 
 .checkout-close:hover,
@@ -2296,6 +2288,61 @@ html:has(.header-ticker) .account-menu {
   font: inherit;
   padding: 0.75rem 0.85rem;
   border-radius: 8px;
+}
+
+.password-field {
+  display: flex;
+  align-items: stretch;
+  min-height: 2.6rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.password-field:focus-within {
+  border-color: var(--ink);
+}
+
+.account-panel .password-field input,
+.account-login .password-field input,
+.checkout-form .password-field input {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  border: 0;
+  border-radius: 10px 0 0 10px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.password-toggle {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.5rem;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  appearance: none;
+  color: var(--muted);
+  padding: 0;
+  cursor: pointer;
+}
+
+.password-toggle svg {
+  width: 1.4rem;
+  height: 1.4rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.password-toggle:hover,
+.password-toggle:focus-visible {
+  background: transparent;
+  color: var(--ink);
 }
 
 .checkout-review {

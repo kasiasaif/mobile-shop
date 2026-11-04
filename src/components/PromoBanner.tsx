@@ -1,100 +1,85 @@
-import { useEffect, useRef, useState, type TouchEvent } from 'react'
-import { Link } from 'react-router-dom'
-import { type Banner } from '../data/banner'
+import { useEffect, useRef, useState, type TouchEvent } from "react";
+import { Link } from "react-router-dom";
+import { type Banner } from "../data/banner";
 
-const holdMs = 5000
-const textOutMs = 700
-const bgMs = 900
-const textInMs = 600
-const swapMs = textOutMs + bgMs + textInMs
-
-type Phase = 'out' | 'bg' | 'in'
+const holdMs = 5000;
+const swapMs = 700;
 
 export function PromoBanner({ banners }: { banners: Banner[] }) {
-  const [index, setIndex] = useState(0)
-  const [leaving, setLeaving] = useState<number | null>(null)
-  const [phase, setPhase] = useState<Phase | null>(null)
-  const touchStartX = useRef<number | null>(null)
-  const indexRef = useRef(0)
-  const total = banners.length
-  const armRef = useRef<(delay: number) => void>(() => {})
-  const showRef = useRef<(next: number) => void>(() => {})
+  const [index, setIndex] = useState(0);
+  const [leaving, setLeaving] = useState<number | null>(null);
+  const touchStartX = useRef<number | null>(null);
+  const indexRef = useRef(0);
+  const total = banners.length;
+  const armRef = useRef<(delay: number) => void>(() => {});
+  const showRef = useRef<(next: number) => void>(() => {});
 
   useEffect(() => {
-    indexRef.current = 0
-    setIndex(0)
-    setLeaving(null)
-    setPhase(null)
-  }, [total])
+    indexRef.current = 0;
+    setIndex(0);
+    setLeaving(null);
+  }, [total]);
 
   useEffect(() => {
-    if (total < 2) return
-    let timer = 0
+    if (total < 2) return;
+    let timer = 0;
     const arm = (delay: number) => {
-      window.clearTimeout(timer)
+      window.clearTimeout(timer);
       timer = window.setTimeout(() => {
-        showRef.current((indexRef.current + 1) % total)
-      }, delay)
-    }
-    armRef.current = arm
-    arm(holdMs)
-    return () => window.clearTimeout(timer)
-  }, [total])
+        showRef.current((indexRef.current + 1) % total);
+      }, delay);
+    };
+    armRef.current = arm;
+    arm(holdMs);
+    return () => window.clearTimeout(timer);
+  }, [total]);
 
   useEffect(() => {
-    if (leaving == null) return
-    const toBg = window.setTimeout(() => setPhase('bg'), textOutMs)
-    const toIn = window.setTimeout(() => setPhase('in'), textOutMs + bgMs)
-    const done = window.setTimeout(() => {
-      setLeaving(null)
-      setPhase(null)
-    }, swapMs)
-    return () => {
-      window.clearTimeout(toBg)
-      window.clearTimeout(toIn)
-      window.clearTimeout(done)
-    }
-  }, [leaving, index])
+    if (leaving == null) return;
+    const done = window.setTimeout(() => setLeaving(null), swapMs);
+    return () => window.clearTimeout(done);
+  }, [leaving, index]);
 
-  if (total === 0) return null
+  if (total === 0) return null;
 
   function show(next: number) {
-    const normalized = (next + total) % total
-    const current = indexRef.current
-    if (normalized === current || leaving != null) return
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    indexRef.current = normalized
-    setIndex(normalized)
+    const normalized = (next + total) % total;
+    const current = indexRef.current;
+    if (normalized === current || leaving != null) return;
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    indexRef.current = normalized;
+    setIndex(normalized);
     if (reduce) {
-      armRef.current(holdMs)
-      return
+      armRef.current(holdMs);
+      return;
     }
-    setLeaving(current)
-    setPhase('out')
-    armRef.current(holdMs + swapMs)
+    setLeaving(current);
+    armRef.current(holdMs + swapMs);
   }
-  showRef.current = show
+  showRef.current = show;
 
   function goTo(next: number) {
-    show(next)
+    show(next);
   }
 
   function onTouchStart(event: TouchEvent<HTMLElement>) {
-    touchStartX.current = event.changedTouches[0]?.clientX ?? null
+    touchStartX.current = event.changedTouches[0]?.clientX ?? null;
   }
 
   function onTouchEnd(event: TouchEvent<HTMLElement>) {
-    if (touchStartX.current == null) return
-    const endX = event.changedTouches[0]?.clientX ?? touchStartX.current
-    const delta = endX - touchStartX.current
-    touchStartX.current = null
-    if (Math.abs(delta) < 48) return
-    goTo(index + (delta < 0 ? 1 : -1))
+    if (touchStartX.current == null) return;
+    const endX = event.changedTouches[0]?.clientX ?? touchStartX.current;
+    const delta = endX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(delta) < 48) return;
+    goTo(index + (delta < 0 ? 1 : -1));
   }
 
   return (
     <section
-      className={phase == null ? 'promo-banner' : `promo-banner is-${phase} is-fading`}
+      className="promo-banner"
       aria-roledescription="carousel"
       aria-label="Promotions"
       onTouchStart={onTouchStart}
@@ -102,15 +87,15 @@ export function PromoBanner({ banners }: { banners: Banner[] }) {
     >
       <div className="promo-track">
         {banners.map((banner, slideIndex) => {
-          const active = slideIndex === index
-          const outgoing = slideIndex === leaving
+          const active = slideIndex === index;
+          const outgoing = slideIndex === leaving;
           const className = active
             ? leaving == null
-              ? 'promo-slide is-active'
-              : 'promo-slide is-active is-entering'
+              ? "promo-slide is-active"
+              : "promo-slide is-active is-entering"
             : outgoing
-              ? 'promo-slide is-leaving'
-              : 'promo-slide'
+              ? "promo-slide is-leaving"
+              : "promo-slide";
           return (
             <article
               key={banner.id}
@@ -126,25 +111,33 @@ export function PromoBanner({ banners }: { banners: Banner[] }) {
                 <p className="eyebrow">tescgsm</p>
                 <h1>{banner.title}</h1>
                 <p className="lede">{banner.body}</p>
-                {banner.ctaHref.startsWith('/') ? (
-                  <Link className="button" to={banner.ctaHref} tabIndex={active ? 0 : -1}>
+                {banner.ctaHref.startsWith("/") ? (
+                  <Link
+                    className="button"
+                    to={banner.ctaHref}
+                    tabIndex={active ? 0 : -1}
+                  >
                     {banner.ctaLabel}
                   </Link>
                 ) : (
-                  <a className="button" href={banner.ctaHref} tabIndex={active ? 0 : -1}>
+                  <a
+                    className="button"
+                    href={banner.ctaHref}
+                    tabIndex={active ? 0 : -1}
+                  >
                     {banner.ctaLabel}
                   </a>
                 )}
               </div>
             </article>
-          )
+          );
         })}
       </div>
 
       {total > 1 ? (
         <div className="promo-dots" role="tablist" aria-label="Banner slides">
           {banners.map((banner, slideIndex) => {
-            const lit = slideIndex === (phase === 'out' && leaving != null ? leaving : index)
+            const lit = slideIndex === index;
             return (
               <button
                 key={banner.id}
@@ -152,13 +145,13 @@ export function PromoBanner({ banners }: { banners: Banner[] }) {
                 role="tab"
                 aria-label={`Show slide ${slideIndex + 1}`}
                 aria-selected={lit}
-                className={lit ? 'is-active' : ''}
+                className={lit ? "is-active" : ""}
                 onClick={() => goTo(slideIndex)}
               />
-            )
+            );
           })}
         </div>
       ) : null}
     </section>
-  )
+  );
 }

@@ -16,6 +16,7 @@ import {
   type CustomerKind,
 } from '../lib/account'
 import { OrderAmounts } from './OrderAmounts'
+import { PasswordField } from './PasswordField'
 import { checkDiscountCode, discountOff, formatMoney } from '../lib/vouchers'
 
 const steps = [
@@ -332,7 +333,9 @@ export function CheckoutModal({ onClose, onPlaced }: CheckoutModalProps) {
             <h2 id={titleId}>{returning ? 'Place your order' : 'Sign in to place your order'}</h2>
           </div>
           <button className="checkout-close" type="button" aria-label="Close checkout" onClick={onClose}>
-            ×
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
           </button>
         </header>
 
@@ -428,8 +431,7 @@ export function CheckoutModal({ onClose, onPlaced }: CheckoutModalProps) {
                           </label>
                           <label>
                             Password
-                            <input
-                              type="password"
+                            <PasswordField
                               value={loginPassword}
                               onChange={(event) => {
                                 setLoginPassword(event.target.value)
@@ -533,8 +535,7 @@ export function CheckoutModal({ onClose, onPlaced }: CheckoutModalProps) {
                       </label>
                       <label>
                         Password
-                        <input
-                          type="password"
+                        <PasswordField
                           value={password}
                           onChange={(event) => {
                             setPassword(event.target.value)
@@ -547,8 +548,7 @@ export function CheckoutModal({ onClose, onPlaced }: CheckoutModalProps) {
                       </label>
                       <label>
                         Confirm password
-                        <input
-                          type="password"
+                        <PasswordField
                           value={confirmPassword}
                           onChange={(event) => {
                             setConfirmPassword(event.target.value)

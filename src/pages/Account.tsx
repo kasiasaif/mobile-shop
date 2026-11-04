@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { OrderAmounts } from '../components/OrderAmounts'
+import { PasswordField } from '../components/PasswordField'
 import { OrderProgress } from '../components/OrderProgress'
 import { formatPrice } from '../data/site'
 import { formatMoney } from '../lib/vouchers'
@@ -67,8 +68,7 @@ function AccountLogin() {
           </label>
           <label>
             Password
-            <input
-              type="password"
+            <PasswordField
               value={password}
               onChange={(event) => {
                 setPassword(event.target.value)
